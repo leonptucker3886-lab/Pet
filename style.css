@@ -27,3 +27,18 @@ input{font-size:18px;padding:8px 12px;border-radius:12px;border:2px solid #2c2c4
 .acts{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px;flex-wrap:wrap;justify-content:center;width:96%}.acts button{background:#000b;padding:8px 12px;font-size:15px}
 @media(max-width:600px){.stage{height:380px}.hint{display:none}}
 .age{background:#1d1d2e;border:1px solid var(--c);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:700}
+
+/* Mobile + kid-friendly */
+html{-webkit-text-size-adjust:100%}body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent;padding-bottom:env(safe-area-inset-bottom)}
+button{min-height:52px;touch-action:manipulation;user-select:none;-webkit-user-select:none;border-radius:18px}
+button:active{transform:scale(.94)}
+@media(max-width:600px){
+header{padding:10px 12px;gap:8px}.wm{font-size:16px}.logo{font-size:24px}.tok{font-size:20px;padding:6px 12px}
+nav{position:sticky;top:0;z-index:5;background:#06060bee;padding:8px;gap:6px;flex-wrap:nowrap;overflow-x:auto}nav button{min-width:auto;flex:1 0 auto;font-size:15px;padding:8px 10px}
+main{padding:8px 8px 30px}.card{padding:12px;border-radius:18px}
+.stage{height:min(62vh,520px)}
+.acts{gap:6px;bottom:8px;width:98%;display:grid;grid-template-columns:repeat(4,1fr)}.acts button{font-size:15px;padding:6px 4px;min-height:56px}
+.grid{grid-template-columns:repeat(2,1fr);gap:8px}.item .e{font-size:48px}.item button{width:100%}
+.bars{grid-template-columns:1fr 1fr}.bar{height:20px}
+.mood{font-size:16px}
+}

@@ -21,7 +21,7 @@ function init(){
  {const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),gr=x.createRadialGradient(64,64,0,64,64,64);gr.addColorStop(0,'rgba(40,20,60,.55)');gr.addColorStop(1,'rgba(40,20,60,0)');x.fillStyle=gr;x.fillRect(0,0,128,128);blob=new THREE.Mesh(new THREE.PlaneGeometry(2.6,2.6),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));blob.rotation.x=-Math.PI/2;blob.position.y=.03;scene.add(blob)}
  floor=mesh(new THREE.CircleGeometry(7,48),new THREE.MeshBasicMaterial({visible:false}));floor.rotation.x=-Math.PI/2;scene.add(floor);
  let down=null;
- cv.addEventListener('pointerdown',e=>down=[e.clientX,e.clientY]);
+ cv.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];cv.parentElement&&cv.parentElement.classList.add('touched')});
  cv.addEventListener('pointermove',e=>{setPtr(e);ray.setFromCamera(ptr,cam);const h=ray.intersectObject(floor)[0];if(h)look.copy(h.point).setY(1.5);cv.style.cursor=petG&&ray.intersectObject(petG,true).length?'pointer':'grab'});
  cv.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>6)return;setPtr(e);ray.setFromCamera(ptr,cam);
   const hp=petG&&ray.intersectObject(petG,true)[0];

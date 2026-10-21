@@ -42,3 +42,32 @@ main{padding:8px 8px 30px}.card{padding:12px;border-radius:18px}
 .bars{grid-template-columns:1fr 1fr}.bar{height:20px}
 .mood{font-size:16px}
 }
+
+/* Picture-only UI for kids who can't read */
+nav button{font-size:34px;min-height:64px;padding:4px}
+.acts button{font-size:30px;min-height:60px;padding:4px}
+.stage .mood{font-size:44px;min-height:0;padding:4px 10px;background:#ffffffcc;border:3px solid #fff;border-radius:50%;animation:wob 2s infinite}
+@keyframes wob{50%{transform:scale(1.12)}}
+.stage .age{position:absolute;top:12px;right:12px;font-size:30px;background:#ffffffcc;border:none;border-radius:50%;padding:4px 8px;z-index:2}
+.stage .hint{top:auto;bottom:90px;right:auto;left:62%;background:none;font-size:46px;animation:tapme 1.4s infinite;opacity:.9}
+@keyframes tapme{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.stage.touched .hint{display:none}
+.meters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.meter{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 4px;min-height:84px;border-width:3px}
+.meter .mi{font-size:32px}.meter .bar{width:90%;height:18px;display:block}
+.meter.ok .bar i{background:#3ddc6b}.meter.mid .bar i{background:#ffc93c}.meter.low .bar i{background:#ff4d4d}
+.meter.low{border-color:#ff4d4d;animation:pulse 1s infinite}@keyframes pulse{50%{box-shadow:0 0 0 6px #ff4d4d55}}
+.sec{font-size:36px;margin-bottom:8px}
+.item.tap{display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;min-height:120px;cursor:pointer}
+.item.tap .e{font-size:56px;line-height:1.1}.item .go{font-size:30px}.item .cnt{color:var(--c);letter-spacing:2px}
+.item .price{font-size:24px}.item.poor{opacity:.5}.item.on{border-color:#3ddc6b;background:#173322}
+.hb{width:100%;height:80px;border-radius:12px;font-size:46px;line-height:80px}
+.empty{width:100%;font-size:40px;min-height:90px}
+.big-ico{font-size:56px;width:100%;background:none;border:none;margin-bottom:8px}
+.name-row{justify-content:center;margin-top:12px}.name-row input{font-size:26px;text-align:center;width:70%}
+.tabs{margin-bottom:12px}.tabs button{font-size:34px;flex:1;min-height:64px;padding:4px}
+.playbar{justify-content:space-between}.startbtn{font-size:40px;min-height:76px;padding:6px 24px;animation:wob 1.6s infinite}
+.score{font-size:40px}.timer{height:16px;background:#222;border-radius:10px;overflow:hidden;margin:10px 0}.timer i{display:block;height:100%;background:#3ddc6b;transition:width 1s linear}
+#game{height:min(55vh,420px)}.star{font-size:54px}.demo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:56px;opacity:.8}
+.toast{font-size:40px;padding:12px 22px;bottom:30px}
+@media(max-width:600px){nav button{font-size:30px}.acts button{font-size:26px}.meters{gap:6px}.meter .mi{font-size:28px}.tabs button{font-size:28px}}

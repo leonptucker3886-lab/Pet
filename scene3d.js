@@ -3,20 +3,20 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 // Cartoon look: toon shading with a 4-step ramp + ink outlines
 const RAMP=(()=>{const d=new Uint8Array([90,90,90,255,160,160,160,255,215,215,215,255,255,255,255,255]);const t=new THREE.DataTexture(d,4,1);t.minFilter=t.magFilter=THREE.NearestFilter;t.needsUpdate=true;return t})();
-const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.7,metalness:0,...o});
+const M=(c,o={})=>{const{roughness,metalness,...r}=o;return new THREE.MeshToonMaterial({color:c,gradientMap:RAMP,...r})};
 const INK=new THREE.MeshBasicMaterial({color:0x2a1d33,side:THREE.BackSide});
-function outline(g,w=.035){return g;const list=[];g.traverse(o=>{if(o.isMesh&&!o.userData.ink&&!o.userData.noink&&o.material!==INK&&!o.material.transparent&&o.material.visible!==false)list.push(o)});
+function outline(g,w=.035){const list=[];g.traverse(o=>{if(o.isMesh&&!o.userData.ink&&!o.userData.noink&&o.material!==INK&&!o.material.transparent&&o.material.visible!==false)list.push(o)});
  list.forEach(o=>{o.geometry.computeBoundingSphere();const r=o.geometry.boundingSphere.radius||1;const k=o.getWorldScale(new THREE.Vector3());const sc=Math.max(.0001,Math.min(k.x,k.y,k.z));const i=new THREE.Mesh(o.geometry,INK);i.userData.ink=1;i.scale.setScalar(1+Math.min(.25,w/(r*sc)));i.castShadow=false;o.add(i)});return g}
 const mesh=(g,m,x=0,y=0,z=0)=>{const o=new THREE.Mesh(g,m);o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;return o};
 const MOB=matchMedia('(pointer:coarse)').matches||innerWidth<700;const S_=r=>new THREE.SphereGeometry(r,MOB?22:36,MOB?16:24),B=(w,h,d)=>new THREE.BoxGeometry(w,h,d),C=(a,b,h,s=24)=>new THREE.CylinderGeometry(a,b,h,s),K=(r,h,s=24)=>new THREE.ConeGeometry(r,h,s);
 let blob,R,scene,cam,ctl,cv,petG,head,homeG,furnG,wearG,eyes=[],ray=new THREE.Raycaster(),ptr=new THREE.Vector2(),key='',clock=new THREE.Clock(),fx=[],anim=null,target=new THREE.Vector3(),look=new THREE.Vector3(0,2,6),floor;
-const COL={pup:[0xe8b98a,0x9a6a48],kit:[0xf6b77a,0xfff6ec],bun:[0xfbf7ff,0xf8c6dc],dra:[0x8fdcae,0xf7dc8a],uni:[0xfffaf5,0xf5a3cf],pen:[0x3d4260,0xfffaf2]};
+const COL={pup:[0xf2b26b,0x8a5230],kit:[0xff9f45,0xfff3e0],bun:[0xffffff,0xff9ccc],dra:[0x5fe08f,0xffd34d],uni:[0xffffff,0xff7fc8],pen:[0x2f3a7a,0xffffff]};
 function init(){
  cv=document.createElement('canvas');cv.className='c3d';
- R=new THREE.WebGLRenderer({canvas:cv,antialias:!MOB||devicePixelRatio<2,preserveDrawingBuffer:true,powerPreference:'low-power'});R.setPixelRatio(Math.min(devicePixelRatio,MOB?1.5:2));R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;R.outputColorSpace=THREE.SRGBColorSpace;R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=1.05;
+ R=new THREE.WebGLRenderer({canvas:cv,antialias:!MOB||devicePixelRatio<2,preserveDrawingBuffer:true,powerPreference:'low-power'});R.setPixelRatio(Math.min(devicePixelRatio,MOB?1.5:2));R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;R.outputColorSpace=THREE.SRGBColorSpace;R.toneMapping=THREE.NoToneMapping;
  scene=new THREE.Scene();cam=new THREE.PerspectiveCamera(45,2,.1,200);cam.position.set(0,3.6,9);
  ctl=new OrbitControls(cam,cv);ctl.target.set(0,1.2,0);ctl.enableDamping=true;ctl.enablePan=false;ctl.minDistance=4.5;ctl.maxDistance=10.5;ctl.maxPolarAngle=Math.PI*.47;ctl.minPolarAngle=Math.PI*.22;ctl.minAzimuthAngle=-Math.PI*.33;ctl.maxAzimuthAngle=Math.PI*.33;
- scene.add(new THREE.HemisphereLight(0xfff4e6,0x8a7fb0,1.5));const rim=new THREE.DirectionalLight(0x9fdfff,1.4);rim.position.set(-6,5,-8);scene.add(rim);
+ scene.add(new THREE.HemisphereLight(0xffffff,0xb8a8e0,1.6));const rim=new THREE.DirectionalLight(0x9fdfff,1.4);rim.position.set(-6,5,-8);scene.add(rim);
  const sun=new THREE.DirectionalLight(0xfff0d8,2.2);sun.position.set(5,10,6);sun.castShadow=true;sun.shadow.mapSize.set(MOB?512:1024,MOB?512:1024);sun.shadow.radius=6;sun.shadow.bias=-.0005;sun.shadow.normalBias=.03;Object.assign(sun.shadow.camera,{left:-9,right:9,top:9,bottom:-9});scene.add(sun);
  {const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),gr=x.createRadialGradient(64,64,0,64,64,64);gr.addColorStop(0,'rgba(40,20,60,.55)');gr.addColorStop(1,'rgba(40,20,60,0)');x.fillStyle=gr;x.fillRect(0,0,128,128);blob=new THREE.Mesh(new THREE.PlaneGeometry(2.6,2.6),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));blob.rotation.x=-Math.PI/2;blob.position.y=.03;scene.add(blob)}
  floor=mesh(new THREE.CircleGeometry(7,48),new THREE.MeshBasicMaterial({visible:false}));floor.rotation.x=-Math.PI/2;scene.add(floor);
@@ -34,8 +34,8 @@ function buildPet(id){
  const g=new THREE.Group(),[c1,c2]=COL[id]||COL.pup,m1=M(c1),m2=M(c2),dark=M(0x111111,{roughness:.2}),white=M(0xffffff),pink=M(0xff8fb8),orange=M(0xffa726);
  const body=mesh(S_(.85),m1,0,.92,0);body.scale.set(1.02,.92,1);g.add(body);
  if(id!=='dra'){const b=mesh(S_(.6),id==='pen'?white:m2,0,.9,.45);b.scale.set(1,1.1,.6);g.add(b)}
- head=new THREE.Group();head.position.set(0,2.1,.1);g.add(head);const hd=mesh(S_(.78),m1);hd.scale.set(1.05,.95,1);head.add(hd);
- eyes=[];for(const s of[-1,1]){const w=mesh(S_(.2),white,s*.28,.08,.6),p=mesh(S_(.14),dark,s*.28,.07,.72),sh=mesh(S_(.05),M(0xffffff,{emissive:0xffffff}),s*.24,.15,.84);w.scale.z=.6;p.userData.noink=1;sh.userData.noink=1;head.add(w,p,sh);eyes.push(w,p,sh);
+ head=new THREE.Group();head.position.set(0,2.1,.1);g.add(head);const hd=mesh(S_(.78),m1);hd.scale.set(1.05,.95,1);head.add(hd);head.scale.setScalar(1.15);
+ eyes=[];for(const s of[-1,1]){const w=mesh(S_(.25),white,s*.3,.1,.58),p=mesh(S_(.18),dark,s*.3,.09,.72),sh=mesh(S_(.065),M(0xffffff,{emissive:0xffffff}),s*.24,.15,.84);w.scale.z=.6;p.userData.noink=1;sh.userData.noink=1;head.add(w,p,sh);eyes.push(w,p,sh);
   const ck=mesh(S_(.1),pink,s*.42,-.12,.52);ck.scale.set(1,.6,.4);head.add(ck)}
  const feetM=id==='pen'?orange:m1;for(const s of[-1,1]){g.add(mesh(S_(.26),feetM,s*.45,.22,.35));const a=mesh(S_(.22),m1,s*.8,1.1,.3);a.userData.arm=s;a.scale.set(.8,1.2,.8);g.add(a)}
  if(id==='pen'){const bk=mesh(K(.14,.35),orange,0,-.05,.78);bk.rotation.x=Math.PI/2;head.add(bk)}

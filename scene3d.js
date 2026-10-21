@@ -9,7 +9,7 @@ function outline(g,w=.035){const list=[];g.traverse(o=>{if(o.isMesh&&!o.userData
  list.forEach(o=>{o.geometry.computeBoundingSphere();const r=o.geometry.boundingSphere.radius||1;const k=o.getWorldScale(new THREE.Vector3());const sc=Math.max(.0001,Math.min(k.x,k.y,k.z));const i=new THREE.Mesh(o.geometry,INK);i.userData.ink=1;i.scale.setScalar(1+Math.min(.25,w/(r*sc)));i.castShadow=false;o.add(i)});return g}
 const mesh=(g,m,x=0,y=0,z=0)=>{const o=new THREE.Mesh(g,m);o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;return o};
 const MOB=matchMedia('(pointer:coarse)').matches||innerWidth<700;const S_=r=>new THREE.SphereGeometry(r,MOB?22:36,MOB?16:24),B=(w,h,d)=>new THREE.BoxGeometry(w,h,d),C=(a,b,h,s=24)=>new THREE.CylinderGeometry(a,b,h,s),K=(r,h,s=24)=>new THREE.ConeGeometry(r,h,s);
-let blob,R,scene,cam,ctl,cv,petG,head,homeG,furnG,wearG,eyes=[],ray=new THREE.Raycaster(),ptr=new THREE.Vector2(),key='',clock=new THREE.Clock(),fx=[],anim=null,target=new THREE.Vector3(),look=new THREE.Vector3(0,2,6),floor;
+let mouth,blinkAt=3,blinkT=0,blob,R,scene,cam,ctl,cv,petG,head,homeG,furnG,wearG,eyes=[],ray=new THREE.Raycaster(),ptr=new THREE.Vector2(),key='',clock=new THREE.Clock(),fx=[],anim=null,target=new THREE.Vector3(),look=new THREE.Vector3(0,2,6),floor;
 const COL={pup:[0xf2b26b,0x8a5230],kit:[0xff9f45,0xfff3e0],bun:[0xffffff,0xff9ccc],dra:[0x5fe08f,0xffd34d],uni:[0xffffff,0xff7fc8],pen:[0x2f3a7a,0xffffff]};
 function init(){
  cv=document.createElement('canvas');cv.className='c3d';
@@ -37,6 +37,7 @@ function buildPet(id){
  head=new THREE.Group();head.position.set(0,2.1,.1);g.add(head);const hd=mesh(S_(.78),m1);hd.scale.set(1.05,.95,1);head.add(hd);head.scale.setScalar(1.15);
  eyes=[];for(const s of[-1,1]){const w=mesh(S_(.25),white,s*.3,.1,.58),p=mesh(S_(.18),dark,s*.3,.09,.72),sh=mesh(S_(.065),M(0xffffff,{emissive:0xffffff}),s*.24,.15,.84);w.scale.z=.6;p.userData.noink=1;sh.userData.noink=1;head.add(w,p,sh);eyes.push(w,p,sh);
   const ck=mesh(S_(.1),pink,s*.42,-.12,.52);ck.scale.set(1,.6,.4);head.add(ck)}
+ mouth=new THREE.Group();mouth.position.set(0,-.36,.66);head.add(mouth);const sm=new THREE.Mesh(new THREE.TorusGeometry(.11,.03,8,16,Math.PI),dark);sm.rotation.z=Math.PI;sm.userData.noink=1;const om=mesh(S_(.1),M(0xc2185b),0,-.04,0);om.scale.set(1,.8,.5);om.userData.noink=1;om.visible=false;mouth.add(sm,om);mouth.userData={sm,om};
  const feetM=id==='pen'?orange:m1;for(const s of[-1,1]){g.add(mesh(S_(.26),feetM,s*.45,.22,.35));const a=mesh(S_(.22),m1,s*.8,1.1,.3);a.userData.arm=s;a.scale.set(.8,1.2,.8);g.add(a)}
  if(id==='pen'){const bk=mesh(K(.14,.35),orange,0,-.05,.78);bk.rotation.x=Math.PI/2;head.add(bk)}
  else{const sn=mesh(S_(.28),id==='pup'||id==='kit'?m2:m1,0,-.18,.55);sn.scale.set(1.1,.8,.8);head.add(sn);head.add(mesh(S_(.08),id==='bun'||id==='uni'?pink:dark,0,-.08,.79))}
@@ -186,9 +187,9 @@ function spawn(kind,pos,txt){if(kind==='step'){const r=mesh(new THREE.RingGeomet
 function burst(txt,n=6,y=2.6){for(let i=0;i<n;i++)setTimeout(()=>petG&&spawn('fx',petG.position.clone().add(new THREE.Vector3(0,y,0)),txt),i*90)}
 let AC,ST={},grow=1,need=null,needT=0;
 function tone(f1,f2,dur,type='sine',vol=.15,delay=0){if(ST.mute)return;AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t=AC.currentTime+delay,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+dur)}
-const SND={pat:()=>{tone(700,1300,.12);tone(900,1600,.12,'sine',.12,.13)},tickle:()=>[0,1,2,3].forEach(i=>tone(900+i*120,1400,.08,'triangle',.1,i*.09)),eat:()=>[0,1,2].forEach(i=>tone(220,120,.09,'square',.06,i*.2)),wash:()=>[0,1,2,3,4].forEach(i=>tone(500+Math.random()*600,1500,.06,'sine',.08,i*.12)),play:()=>[0,1,2].forEach(i=>tone(520+i*200,780+i*200,.12,'triangle',.12,i*.12)),nap:()=>[0,1.1].forEach(d=>tone(90,60,.8,'sawtooth',.05,d)),happy:()=>tone(600,1200,.25)};
+const SND={pat:()=>{tone(700,1300,.12);tone(900,1600,.12,'sine',.12,.13)},tickle:()=>[0,1,2,3].forEach(i=>tone(900+i*120,1400,.08,'triangle',.1,i*.09)),eat:()=>[0,1,2].forEach(i=>tone(220,120,.09,'square',.06,i*.2)),wash:()=>[0,1,2,3,4].forEach(i=>tone(500+Math.random()*600,1500,.06,'sine',.08,i*.12)),play:()=>[0,1,2].forEach(i=>tone(520+i*200,780+i*200,.12,'triangle',.12,i*.12)),nap:()=>[0,1.1].forEach(d=>tone(90,60,.8,'sawtooth',.05,d)),happy:()=>tone(600,1200,.25),dance:()=>[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,f*1.01,.18,'triangle',.1,i*.22))};
 // actions called by the app (or by tapping the pet)
-const ACT={pat:{t:.8,fx:'💖'},tickle:{t:1,fx:'😆'},eat:{t:1.4,fx:'😋'},wash:{t:1.6,fx:'🫧'},play:{t:2.2,fx:'⭐'},nap:{t:2.6,fx:'💤'},happy:{t:1,fx:'✨'}};
+const ACT={pat:{t:.8,fx:'💖'},tickle:{t:1,fx:'😆'},eat:{t:1.4,fx:'😋'},wash:{t:1.6,fx:'🫧'},play:{t:2.2,fx:'⭐'},nap:{t:2.6,fx:'💤'},happy:{t:1,fx:'✨'},dance:{t:3,fx:'🎵'}};
 function act(kind,emoji){const a=ACT[kind]||ACT.happy;(SND[kind]||SND.happy)();anim={kind,t:0,dur:a.t};
  if(kind==='pat'||kind==='tickle'){burst(a.fx,kind==='pat'?4:5);if(kind==='pat'&&window.pat)window.pat(true);if(kind==='tickle'&&window.tickle)window.tickle()}
  else{burst(emoji||a.fx,7);if(kind==='play'&&emoji){const b=sprite(emoji);b.scale.setScalar(.9);scene.add(b);fx.push({o:b,t:0,life:2.2,toss:1,from:petG.position.clone()})}
@@ -205,15 +206,17 @@ function loop(){requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),.
    if(anim.kind==='eat'){head.rotation.x=Math.sin(anim.t*18)*.2}
    if(anim.kind==='wash'){petG.rotation.y+=dt*8*s;if(Math.random()<.4)spawn('fx',p.clone().add(new THREE.Vector3((Math.random()-.5)*1.5,Math.random()*2.5,(Math.random()-.5)*1.5)),'🫧')}
    if(anim.kind==='play'||anim.kind==='happy'){y+=Math.abs(Math.sin(k*Math.PI*3))*1.1;petG.rotation.y+=anim.kind==='play'?dt*5:0}
+   if(anim.kind==='dance'){y+=Math.abs(Math.sin(anim.t*8))*.5;rz=Math.sin(anim.t*6)*.25;petG.rotation.y+=dt*3}
    if(anim.kind==='nap'){rx=-s*1.2;y-=s*.3}
    if(k>=1){anim=null;head.rotation.x=0}}
   petG.scale.set(sx*grow,sy*grow,sx*grow);blob.position.x=p.x;blob.position.z=p.z;blob.scale.setScalar(grow*(1-Math.min(p.y,1)*.35));p.y=y;petG.rotation.z=rz;petG.rotation.x=rx*.6;
   petG.traverse(o=>{if(o.userData.arm!==undefined){const s=o.userData.arm;o.position.set(s*.8,1.1,.3);o.rotation.z=0;
     if(!anim&&!walking&&need){if(need==='h'){o.position.set(s*.35,.95+Math.sin(t*6+s)*.12,.8)}else if(s>0){o.position.set(1,1.9,.3);o.rotation.z=Math.sin(t*8)*.6}}}});
   if(need&&!anim&&(needT-=dt)<0){needT=2.5;spawn('fx',p.clone().add(new THREE.Vector3(0,3.3*grow,0)),{h:'🍎',c:'🫧',en:'💤',j:'⚽'}[need])}
-  const blink=(t%4)<.12?.1:1;eyes.forEach(e=>e.scale.y=blink);
+  if(t>blinkAt){blinkT=.14;blinkAt=t+2+Math.random()*3.5}blinkT-=dt;const blink=blinkT>0||(anim&&anim.kind==='nap')?.1:1;eyes.forEach(e=>e.scale.y=blink);
+  if(mouth){const{sm,om}=mouth.userData,open=anim&&anim.kind!=='nap'&&anim.kind!=='eat'||(anim&&anim.kind==='eat'&&Math.sin(anim.t*18)>0);om.visible=!!open;sm.visible=!open;sm.rotation.z=need&&!anim?0:Math.PI;sm.position.y=need&&!anim?-.1:0}
   if(!anim||anim.kind!=='eat'){const lp=head.parent.worldToLocal(look.clone());head.rotation.y=THREE.MathUtils.clamp(Math.atan2(lp.x,lp.z),-.6,.6)*.6;head.rotation.x=THREE.MathUtils.clamp(-(lp.y-2.1)*.08,-.3,.3)}
-  petG.traverse(o=>{if(o.userData.wing)o.rotation.z=-o.userData.wing*(.6+Math.sin(t*(walking?14:3))*.3);if(o.userData.tail)o.rotation.z=Math.sin(t*(walking?12:4))*.4;if(o.userData.ear){const s=o.userData.ear,pt=anim&&(anim.kind==='pat'||anim.kind==='happy'||anim.kind==='play')?Math.sin(anim.t*16)*.35:0;o.rotation.z=s*(.12+Math.sin(t*3+s)*.06+(walking?Math.sin(t*10)*.15:0))+pt}})}
+  petG.traverse(o=>{if(o.userData.wing)o.rotation.z=-o.userData.wing*(.6+Math.sin(t*(walking?14:3))*.3);if(o.userData.tail)o.rotation.z=Math.sin(t*(walking||(anim&&anim.kind!=='nap')?14:need?1.5:5))*(need&&!anim?.15:.5);if(o.userData.ear){const s=o.userData.ear,pt=anim&&(anim.kind==='pat'||anim.kind==='happy'||anim.kind==='play')?Math.sin(anim.t*16)*.35:0;o.rotation.z=s*(.12+Math.sin(t*3+s)*.06+(walking?Math.sin(t*10)*.15:0))+pt}})}
  scene&&scene.traverse(o=>{if(o.userData.tv)o.material.emissive.setHSL((t*.1)%1,.8,.4);if(o.userData.sea)o.position.y=-.2+Math.sin(t)*.06;const u=o.userData;if(u.sway!==undefined)o.rotation.z=Math.sin(t*1.3+u.sway)*.04;if(u.drift)o.position.x=u.x0+Math.sin(t*u.drift*.2)*4;if(u.spin)o.rotation.y+=dt*u.spin;if(u.bob)o.position.y+=Math.sin(t*1.5+o.position.x)*.003;if(u.tw!==undefined)o.material.emissiveIntensity=1+Math.sin(t*3+u.tw*1.7)*.7;if(u.flame){o.scale.y=1+Math.sin(t*14+o.id)*.15;o.material.emissiveIntensity=1.3+Math.sin(t*9+o.id)*.4}if(u.clock)o.rotation.z=-t*.5;if(u.fly!==undefined){o.position.set(u.c0.x+Math.sin(t*.6+u.fly)*1.5,u.c0.y+Math.sin(t*1.7+u.fly)*.3,u.c0.z+Math.cos(t*.5+u.fly)*1.5);o.rotation.y=t*.6+u.fly}if(u.wingB)o.rotation.z=u.wingB*Math.sin(t*18)*.8;if(u.crab)o.position.x=4.5+Math.sin(t*.7)*1.2});
  for(let i=fx.length-1;i>=0;i--){const f=fx[i];f.t+=dt;const k=f.t/f.life;
   if(f.ring){f.o.scale.setScalar(1+k*2);f.o.material.opacity=1-k}

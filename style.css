@@ -71,3 +71,30 @@ nav button{font-size:34px;min-height:64px;padding:4px}
 #game{height:min(55vh,420px)}.star{font-size:54px}.demo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:56px;opacity:.8}
 .toast{font-size:40px;padding:12px 22px;bottom:30px}
 @media(max-width:600px){nav button{font-size:30px}.acts button{font-size:26px}.meters{gap:6px}.meter .mi{font-size:28px}.tabs button{font-size:28px}}
+/* v3 */
+#nav{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+#nav button{min-width:0;padding-left:0;padding-right:0}
+.grid.two{grid-template-columns:1fr 1fr}.grid.stk{grid-template-columns:repeat(4,1fr)}
+.who .e{font-size:64px}.who.b{border:4px solid #22f0ff}.who.p{border:4px solid #ff6fb5}
+.cf{position:fixed;top:-12px;width:10px;height:16px;border-radius:3px;z-index:99;pointer-events:none;animation:cf 2.8s ease-in forwards}
+@keyframes cf{to{transform:translateY(105vh) rotate(720deg)}}
+.spinc{display:flex;flex-direction:column;align-items:center;gap:14px;position:relative}
+.ptr{font-size:40px;margin-bottom:-26px;z-index:2;filter:drop-shadow(0 2px 2px #0008)}
+.wheel{position:relative;width:min(80vw,320px);aspect-ratio:1;border-radius:50%;border:8px solid #fff;box-shadow:0 8px 30px #0006}
+.wheel span{position:absolute;inset:0;display:flex;justify-content:center;padding-top:8%}
+.wheel span b{font-size:clamp(16px,5vw,24px);text-shadow:0 1px 2px #fff}
+.wheel .hub{position:absolute;left:50%;top:50%;width:22%;height:22%;transform:translate(-50%,-50%);border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:28px}
+.mg{position:relative;height:min(62vh,440px);overflow:hidden;border-radius:18px;background:linear-gradient(#bdeeff,#fff5e0);touch-action:none}
+.basket{position:absolute;bottom:4%;left:50%;transform:translateX(-50%);font-size:56px}.basket.shake{animation:sh .3s}
+@keyframes sh{25%{margin-left:-8px}75%{margin-left:8px}}
+.fall{position:absolute;font-size:38px;transform:translateX(-50%)}
+.bub{position:absolute;bottom:-60px;font-size:52px;animation:rise linear forwards;cursor:pointer}
+@keyframes rise{to{bottom:110%}}
+.boxes{display:flex;justify-content:space-around;align-items:center;height:100%}
+.hbox{font-size:64px;width:28%;aspect-ratio:1;border-radius:20px;border:0;background:#fff;box-shadow:0 6px 0 #ccc}
+.hbox.found{background:#c8f7c5;animation:pop .4s}@keyframes pop{50%{transform:scale(1.2)}}
+.guide{position:fixed;right:14px;bottom:18px;z-index:90;font-size:54px;background:#fff;border:4px solid #22f0ff;border-radius:50%;width:84px;height:84px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px #0006;animation:gb 1.2s ease-in-out infinite}
+.guide span{position:absolute;right:-6px;bottom:-6px;font-size:28px}
+@keyframes gb{50%{transform:translateY(-8px)}}
+.gpoint{position:absolute;z-index:89;font-size:44px;pointer-events:none;animation:gb .8s infinite}
+.ghelp{margin-left:6px;font-size:22px;background:none;border:0}

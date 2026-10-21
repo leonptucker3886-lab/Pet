@@ -2,7 +2,7 @@ let S=JSON.parse(localStorage.getItem('llpet')||'null')||{tokens:50,pet:null,nam
 const save=()=>localStorage.setItem('llpet',JSON.stringify(S));
 const decay=m=>{for(const k in S.st)S.st[k]=Math.max(10,S.st[k]-m*0.3);S.t=Date.now()};
 decay((Date.now()-S.t)/60000);
-const today=new Date().toDateString();let gift=0;if(S.lastDay!==today){if(S.pet){S.days=(S.days||0)+1;gift=10;S.tokens+=gift}S.lastDay=S.pet?today:null;save()}
+const today=new Date().toDateString();let gift=0;if(S.lastDay!==today){if(S.pet){S.days=(S.days||0)+1;S.spin=1}S.lastDay=S.pet?today:null;save()}
 function mute(){S.mute=!S.mute;save();render()}
 setInterval(()=>{decay(1);save();if(S.view==='home')render()},60000);
 const $=id=>document.getElementById(id);
@@ -69,4 +69,4 @@ function render(){$('tok').textContent=S.tokens;
 addEventListener('pet3d-ready',()=>render());
 const q=new URLSearchParams(location.search).get('earn');if(q){S.tokens+=Math.max(0,+q|0);save();history.replaceState(null,'',location.pathname)}
 render();
-if(gift)setTimeout(()=>pop('🎁 🪙+'+gift+' 📏⬆️','Welcome back! Here is a present!'),700);
+
